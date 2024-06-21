@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Automate</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #555;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        input[type="text"], input[type="date"], input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-align: center;
+            height: 30px;
+            font-size: 12px;
+        }
+        .button-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+        }
+        button i {
+            margin-right: 5px;
+        }
+        .print-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .export-button {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .duplicate-button {
+            background-color: #6c757d;
+            color: #fff;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .action-icons {
+            text-align: center;
+        }
+        .action-icons button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            min-width: 57px;
+        }
+        .name-field {
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            padding: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .table-wrapper {
+            margin-bottom: 20px;
+            position: relative;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        .table-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        th {
+            text-align: center; /* Center align headers */
+        }
+        .footer {
+            padding: 20px;
+            background-color: #f2f2f2;
+            text-align: right;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .footer span {
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            table, th, td {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            .table-actions {
+                top: 5px;
+                right: 5px;
+            }
+        }
+        @media print {
+            .print-button, .export-button, .duplicate-button, .delete-button, .action-icons, .action-column {
+                display: none !important;
+            }
+            th:nth-child(7), td:nth-child(7) {
+                display: none !important;
+            }
+            th, td {
+                padding: 5px;
+                border: 1px solid #000;
+                font-size: 10px;
+            }
+            table {
+                width: 100% !important;
+                border-collapse: collapse;
+                font-size: 10px;
+                margin: 0 auto; /* Center the table */
+            }
+            .container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0 auto; /* Center the container */
+                box-shadow: none;
+                padding: 0;
+            }
+            .name-field {
+                text-align: left;
+                margin: 0;
+            }
+            th {
+                text-align: center; /* Center align headers */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="button-container">
+            <button class="print-button" onclick="window.print()"><i class="fa fa-print"></i> Print</button>
+            <button class="export-button" onclick="exportToCSV()"><i class="fa fa-file-export"></i> Export</button>
+        </div>
+        <div id="tablesContainer">
+            <div class="table-wrapper">
+                <div class="table-actions">
+                    <button class="duplicate-button" onclick="duplicateTable(this)"><i class="fa fa-copy"></i> Duplicate Table </button>
+                    <button class="delete-button" onclick="deleteTable(this)"><i class="fa fa-trash"></i> Delete Table </button>
+                </div>
+                <input type="text" class="name-field" placeholder="Enter name here" value="">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Amount</th>
+                                <th>Processing Date</th>
+                                <th>Return Date</th>
+                                <th>Profit</th>
+                                <th>Current Date</th>
+                                <th class="action-column">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="number" value=""></td>
+                                <td><input type="number" class="amount" value=""></td>
+                                <td><input type="date" class="processing-date" value=""></td>
+                                <td><input type="date" class="return-date" value=""></td>
+                                <td><input type="number" class="profit" value=""></td>
+                                <td><input type="date" class="current-date" value=""></td>
+                                <td class="action-icons">
+                                    <button class="duplicate-button" onclick="duplicateRow(this)"><i class="fa fa-copy"></i></button>
+                                    <button class="delete-button" onclick="deleteRow(this)"><i class="fa fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <span id="totalAmount">Total Amount: 0</span>
+            <span id="totalProfit">Total Profit: 0</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            attachEventListeners();
+            updateFooter();
+        });
+
+        function attachEventListeners() {
+            document.querySelectorAll('input.amount, input.profit').forEach(input => {
+                input.addEventListener('input', updateFooter);
+            });
+            document.querySelectorAll('input.processing-date').forEach(input => {
+                input.addEventListener('change', handleProcessingDateChange);
+            });
+            document.querySelectorAll('input.current-date').forEach(input => {
+                input.addEventListener('change', handleCurrentDateChange);
+            });
+        }
+
+        function handleProcessingDateChange(event) {
+            const input = event.target;
+            const row = input.closest('tr');
+            const processingDate = new Date(input.value);
+            const returnDateInput = row.querySelector('.return-date');
+
+            if (returnDateInput) {
+                const returnDate = new Date(processingDate);
+                returnDate.setDate(returnDate.getDate() + 35);
+                returnDateInput.value = returnDate.toISOString().split('T')[0];
+            }
+        }
+
+        function handleCurrentDateChange(event) {
+            const input = event.target;
+            const row = input.closest('tr');
+
+            if (input.closest('td').cellIndex === 5) { // Assuming current date is in the 6th column
+                const currentDate = new Date(input.value);
+                duplicateTableWithCurrentDate(row, currentDate);
+            }
+        }
+
+        function duplicateTableWithCurrentDate(row, currentDate) {
+            const originalTableWrapper = row.closest('.table-wrapper');
+            const container = document.getElementById('tablesContainer');
+            const newTableWrapper = originalTableWrapper.cloneNode(true);
+
+            const originalInputs = row.querySelectorAll('td input');
+            const newTableInputs = newTableWrapper.querySelectorAll('tbody tr td input');
+
+            newTableInputs.forEach((input, index) => {
+                if (input.closest('td').cellIndex === 2) { // Processing Date
+                    input.value = currentDate.toISOString().split('T')[0];
+                } else if (input.closest('td').cellIndex === 3) { // Return Date
+                    const processingDate = new Date(currentDate);
+                    processingDate.setDate(processingDate.getDate() + 35);
+                    input.value = processingDate.toISOString().split('T')[0];
+                } else if (input.closest('td').cellIndex === 5) { // Current Date
+                    input.value = currentDate.toISOString().split('T')[0];
+                } else {
+                    input.value = originalInputs[index].value;
+                }
+            });
+
+            container.appendChild(newTableWrapper);
+
+            attachEventListeners();
+            updateFooter();
+        }
+
+        function duplicateTable(button) {
+            const tableWrapper = button.closest('.table-wrapper');
+            const newTableWrapper = tableWrapper.cloneNode(true);
+            document.getElementById('tablesContainer').appendChild(newTableWrapper);
+
+            attachEventListeners();
+            updateFooter();
+        }
+
+        function deleteTable(button) {
+            const tableWrapper = button.closest('.table-wrapper');
+            tableWrapper.remove();
+
+            updateFooter();
+        }
+
+        function duplicateRow(button) {
+            const row = button.closest('tr');
+            const newRow = row.cloneNode(true);
+            row.parentNode.appendChild(newRow);
+
+            attachEventListeners();
+            updateFooter();
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+
+            updateFooter();
+        }
+
+        function updateFooter() {
+            const tables = document.querySelectorAll('.table-wrapper table tbody');
+            let totalAmount = 0;
+            let totalProfit = 0;
+
+            tables.forEach(tbody => {
+                tbody.querySelectorAll('tr').forEach(row => {
+                    const amount = parseFloat(row.querySelector('td:nth-child(2) input').value) || 0;
+                    const profit = parseFloat(row.querySelector('td:nth-child(5) input').value) || 0;
+                    totalAmount += amount;
+                    totalProfit += profit;
+                });
+            });
+
+            document.getElementById('totalAmount').textContent = `Total Amount: ${totalAmount.toFixed(2)}`;
+            document.getElementById('totalProfit').textContent = `Total Profit: ${totalProfit.toFixed(2)}`;
+        }
+
+      
+        
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            // Loop through each table
+            document.querySelectorAll('.table-wrapper').forEach((wrapper, index) => {
+                // Get the table name from the input with placeholder "Enter name here"
+                let tableName = wrapper.querySelector('input[placeholder="Enter name here"]').value;
+                if (!tableName) {
+                    tableName = `Table ${index + 1}`;  // Default name if none provided
+                }
+
+                // Add the table name to the CSV
+                csvContent += `${tableName}\n`;
+
+                // Add the headers for each table
+                csvContent += "ID,Amount,Processing Date,Return Date,Profit,Current Date\n";
+
+                // Loop through each row in the table
+                wrapper.querySelectorAll('tbody tr').forEach(row => {
+                    let rowData = [];
+                    row.querySelectorAll('td:not(:last-child) input').forEach(input => {
+                        rowData.push(input.value);
+                    });
+                    csvContent += rowData.join(",") + "\n";
+                });
+
+                // Add a blank line after each table for clarity
+                csvContent += "\n";
+            });
+
+            // Append the totals at the end
+            const totalAmount = document.getElementById('totalAmount').textContent.split(": ")[1];
+            const totalProfit = document.getElementById('totalProfit').textContent.split(": ")[1];
+
+            csvContent += `Total Amount,${totalAmount}\n`;
+            csvContent += `Total Profit,${totalProfit}\n`;
+
+            // Create a downloadable link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "table_data.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+
+    </script>
+</body>
+</html>
